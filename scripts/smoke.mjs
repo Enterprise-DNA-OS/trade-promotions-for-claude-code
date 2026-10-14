@@ -203,7 +203,8 @@ try {
   const cli = spawnSync(process.execPath, ['scripts/trade.mjs', 'claims', '--json'], { cwd: REPO_ROOT, env: process.env, encoding: 'utf8' });
   check(cli.status === 0 && Array.isArray(JSON.parse(cli.stdout)), 'CLI JSON');
   const amb = spawnSync(process.execPath, ['scripts/trade.mjs', 'customer', 'a', '--json'], { cwd: REPO_ROOT, env: process.env, encoding: 'utf8' });
-  check(amb.status === 1 && JSON.parse(amb.stderr).candidates.length > 1, 'ambiguous name lists candidates and exits 1');
+  const ambJson = String(amb.stderr).split(/\r?\n/).find((l) => l.startsWith('{"error"'));
+  check(amb.status === 1 && ambJson && JSON.parse(ambJson).candidates.length > 1, `ambiguous name lists candidates and exits 1 (status ${amb.status}): ${amb.stderr}`);
   for (const command of Object.keys(usage)) check(covered.has(command), 'not exercised: ' + command);
   console.log(`PASS: ${checks} checks; ${Object.keys(usage).length} CLI commands; ${process.env.TEST_DATABASE_URL ? 'PostgreSQL' : 'PGlite'}`);
 } finally {
