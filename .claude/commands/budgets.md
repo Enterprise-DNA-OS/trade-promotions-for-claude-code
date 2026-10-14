@@ -1,0 +1,9 @@
+---
+description: Trade budget by customer for the year: committed, proposed, spent and left.
+---
+
+Run: `npm run trade -- budgets`
+
+Flag any customer over budget and what is proposed on top.
+
+Options use --name=value. Add --json for structured output. Money is GST exclusive, in each customer's currency. Drafts go to drafts/ and are never sent from here. Nothing here pays, invoices or emails a retailer.

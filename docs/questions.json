@@ -1,0 +1,12 @@
+[
+  ["Which promotions are in store in the next three weeks and still not agreed?", "calendar"],
+  ["Which retailer deductions have we not matched to a promotion, and how old are they?", "deductions"],
+  ["Where has a retailer claimed more than the promotion was worth?", "compliance"],
+  ["Which deductions were taken off our remittance without our written consent?", "compliance"],
+  ["Which promotional orders were cut by more than 10% without our agreement?", "compliance"],
+  ["How much promotional stock was left unsold after each promotion, and what is that worth back to us?", "compliance"],
+  ["What do we owe retailers in scan and fixed funding at month end that they have not claimed yet?", "accruals"],
+  ["Which of last quarter's promotions made us money once you take out what we would have sold anyway?", "evaluation"],
+  ["Which customers are over their trade budget for the year, and what is proposed on top?", "budgets"],
+  ["Which Australian retailers have sat on our price increase for more than 30 days?", "compliance"]
+]

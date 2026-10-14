@@ -1,14 +1,32 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Trade Promotions for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Trade promotions this week",
+    "subtitle": "What is in store, what retailers have claimed, and what the checks found",
     "sections": [
-      {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
-      }
+      { "title": "Needs a person", "note": "Promotions close to store and not agreed, claims to match and approve, and every check that failed.", "sql": "select what,item,detail from (select 1 as ord,'live or starting soon, not agreed' as what,ref as item,customer||', in store '||instore_start as detail from promo_totals where status in ('draft','proposed') and instore_start<=current_date+(select value from policy where key='notice_days')::int union all select 2,'claim to match',ref,customer||' '||retailer_ref from claim_work where status='open' and promotion is null union all select 3,'claim to approve',ref,customer||' '||retailer_ref||' on '||promotion from claim_work where status='matched' union all select 4,'check '||rule,ref,subject||': '||finding from compliance_findings) a order by ord,item" },
+      { "title": "In store in the next six weeks", "sql": "select instore_start,instore_end,ref,customer,title,mechanic,phase,forecast_units,actual_units,currency,trade_spend_cents,notice_on from promo_totals where phase in ('proposed','upcoming','live','draft') and instore_start<=current_date+42 order by instore_start" },
+      { "title": "Claims and deductions to clear", "note": "Oldest first. A set-off is a deduction taken off a remittance.", "sql": "select ref,customer,retailer_ref,received_on,days_open,kind,method,currency,amount_cents,promotion,expected_cents,status from claim_work where status in ('open','matched','disputed') order by days_open desc" }
+    ]
+  },
+  {
+    "name": "money",
+    "title": "Trade spend",
+    "subtitle": "Accruals, budgets and what each promotion returned",
+    "sections": [
+      { "title": "Open accruals", "note": "Scan and fixed funding owed on promotions that have started, less claims already matched. Off-invoice is not accrued: it came off the invoice.", "sql": "select customer,ref,phase,instore_start,instore_end,currency,accrued_cents,claimed_cents,open_cents,basis from accruals order by customer,instore_start" },
+      { "title": "Budget by customer", "sql": "select customer,year_start,currency,budget_cents,committed_cents,proposed_cents,spent_cents,remaining_cents from budget_work order by year_start desc,customer" },
+      { "title": "Post-event results", "note": "Extra gross profit is promotion gross profit less what the baseline would have earned at list price. ROI is that divided by trade spend.", "sql": "select ref,customer,title,mechanic,instore_start,baseline_units,units,uplift_pct,currency,trade_spend_cents,incremental_gp_cents,roi from evaluation order by instore_start desc" }
+    ]
+  },
+  {
+    "name": "grocery-code",
+    "title": "Grocery code checks",
+    "subtitle": "Promotion funding, notice, order cuts, set-offs and price increases against the NZ and AU codes",
+    "sections": [
+      { "title": "What the checks found", "note": "Rules and sources are in docs/compliance.md. This is a record check, not legal advice.", "sql": "select rule,ref,subject,finding from compliance_findings order by rule,ref" },
+      { "title": "Supply agreements", "sql": "select code,name,country,large_grocery,funding_clause,setoff_clause,payment_days from customers where active order by country,code" },
+      { "title": "Price increases", "sql": "select c.name as customer,c.country,i.notified_on,i.effective_on,i.pct,i.response,i.responded_on from price_increases i join customers c on c.id=i.customer_id order by i.notified_on desc" }
     ]
   }
 ]

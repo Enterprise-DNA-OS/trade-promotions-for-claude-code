@@ -1,11 +1,45 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
+    "name": "promotion-agreement",
+    "title": "Promotion agreement",
+    "for_each": "select id,ref from promotions where status in ('proposed','agreed') order by ref",
+    "file": "ref",
+    "sections": [
+      { "title": "Promotion", "sql": "select ref,customer,title,mechanic,instore_start,instore_end,weeks,status,agreed_by,agreed_on,notice_on from promo_totals where id=$1" },
+      { "title": "Products and deal rates", "note": "Per unit, excluding GST. Off-invoice comes off the invoice on the promotional order; scan is claimed on units sold.", "sql": "select sku,product,currency,shelf_cents,promo_shelf_cents,list_cents,off_invoice_cents,scan_cents,net_cents,forecast_units,ordered_units,final_units from line_work where promotion_id=$1 order by sku" },
+      { "title": "Funding", "note": "The supplier funds this promotion as set out here and no further.", "sql": "select currency,off_invoice_cents,scan_cents,fixed_cents,fixed_kind,trade_spend_cents,funding_reason from promo_totals where id=$1" }
+    ]
+  },
+  {
+    "name": "claim-query",
+    "title": "Claim query",
+    "for_each": "select id,ref from claims where status='disputed' or id in (select c.id from claims c join compliance_findings f on f.ref=c.ref or f.ref like c.ref||' and %' or f.ref like '% and '||c.ref) order by ref",
+    "file": "ref",
+    "sections": [
+      { "title": "Claim", "sql": "select ref,customer,retailer_ref,received_on,kind,method,consent_ref,currency,amount_cents,period_from,period_to,status,note from claim_work where id=$1" },
+      { "title": "The promotion it was matched to", "sql": "select promotion,instore_start,instore_end,currency,expected_cents from claim_work where id=$1 and promotion is not null" },
+      { "title": "Why we are querying it", "sql": "select f.rule,f.finding from compliance_findings f join claims c on f.ref=c.ref or f.ref like c.ref||' and %' or f.ref like '% and '||c.ref where c.id=$1 order by f.rule" }
+    ]
+  },
+  {
+    "name": "accrual-schedule",
+    "title": "Trade accrual schedule",
+    "for_each": "select distinct c.id,c.name from customers c join promo_totals t on t.customer_id=c.id where t.phase in ('live','completed') and t.status='agreed' order by c.name",
     "file": "name",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      { "title": "Accrued, claimed and open", "note": "For month end. Scan funding is accrued on scan units where the retailer has sent them, forecast units where not.", "sql": "select a.ref,a.phase,a.instore_start,a.instore_end,a.currency,a.accrued_cents,a.claimed_cents,a.open_cents,a.basis from accruals a join customers c on c.code=a.customer_code where c.id=$1 order by a.instore_start" },
+      { "title": "Claims not yet matched", "sql": "select ref,retailer_ref,received_on,kind,method,currency,amount_cents,status from claim_work where customer_id=$1 and status='open' and promotion is null order by received_on" }
+    ]
+  },
+  {
+    "name": "post-event-report",
+    "title": "Post-event report",
+    "for_each": "select id,ref from promotions where id in (select id from promo_totals where phase='completed') order by ref",
+    "file": "ref",
+    "sections": [
+      { "title": "Result", "sql": "select e.ref,e.customer,e.title,e.mechanic,e.instore_start,e.instore_end,e.baseline_units,e.units,e.uplift_pct,e.currency,e.trade_spend_cents,e.incremental_gp_cents,e.roi from evaluation e join promotions p on p.ref=e.ref where p.id=$1" },
+      { "title": "By product", "sql": "select sku,product,currency,net_cents,margin_pct,baseline_units,forecast_units,actual_units,final_units from line_work where promotion_id=$1 order by sku" },
+      { "title": "Claims against it", "sql": "select ref,retailer_ref,kind,currency,amount_cents,status from claim_work where promotion_id=$1 order by received_on" }
     ]
   }
 ]

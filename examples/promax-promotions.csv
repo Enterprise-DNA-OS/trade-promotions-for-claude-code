@@ -1,0 +1,5 @@
+Promotion ID,Customer,Promotion Name,Promotion Type,Start Date,End Date,Status,Product Code,Promo Price,Off Invoice,Scan,Forecast Units,Fixed Amount
+88104,Harbour NZ,Crackers back to school,Shelf Price Reduction,01/02/2027,14/02/2027,Approved,10045,3.99,0.20,0.50,1700,
+88104,Harbour NZ,Crackers back to school,Shelf Price Reduction,01/02/2027,14/02/2027,Approved,10046,3.99,0.20,0.50,1000,
+88131,Coastline,Muesli mailer,Catalogue,08/03/2027,21/03/2027,Submitted,20511,6.50,0.80,0.60,2600,"3,500.00"
+88140,Coastline,Relish online,Online Feature,15/03/2027,28/03/2027,Draft,30201,5.49,0.00,0.40,900,

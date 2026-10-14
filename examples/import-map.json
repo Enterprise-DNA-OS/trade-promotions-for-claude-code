@@ -1,0 +1,7 @@
+{
+  "_": "Promax layouts differ by business. Map your column headings, customer names, product codes and promotion types to this system. Leave a section empty when the defaults fit.",
+  "columns": {},
+  "customers": { "Harbour NZ": "HSM-NZ", "Coastline": "CSM-AU" },
+  "products": { "10045": "TRF-CRK-SS", "10046": "TRF-CRK-RO", "20511": "TRF-MUE-500", "30201": "TRF-REL-TOM" },
+  "mechanics": { "Shelf Price Reduction": "tpr", "Online Feature": "online" }
+}
